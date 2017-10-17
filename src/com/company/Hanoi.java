@@ -14,7 +14,7 @@ public class Hanoi {
         List<Integer> elements = state.getElements();
 
         for (Integer el : elements) {
-            if (el != state.getNumberOfTowers()) {
+            if (el != state.getNumberOfTowers() - 1) {
                 return false;
             }
         }
@@ -39,5 +39,6 @@ public class Hanoi {
         return true;
 
     }
+
 
 }

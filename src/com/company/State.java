@@ -13,7 +13,9 @@ public class State {
         this.numberOfDisks = numberOfDisks;
         this.numberOfTowers = numberOfTowers;
 
-        for(int i = 0; i < numberOfDisks; ++i) {
+        elements = new ArrayList<>();
+
+        for (int i = 0; i < numberOfDisks; ++i) {
             elements.add(1);
         }
     }
@@ -32,5 +34,21 @@ public class State {
 
     public List<Integer> getElements() {
         return Collections.unmodifiableList(elements);
+    }
+
+    public void updateState(int position, int tower) {
+        elements.set(position, tower);
+    }
+
+    public String toString() {
+        StringBuilder result = new StringBuilder("Number of towers: " + this.numberOfTowers + "\n");
+        result.append("(");
+        for (Integer el : elements) {
+            result.append(el + 1).append(", ");
+        }
+        result.deleteCharAt(result.length() - 1);
+        result.deleteCharAt(result.length() - 1);
+        result.append(")\n");
+        return result.toString();
     }
 }
