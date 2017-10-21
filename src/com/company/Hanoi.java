@@ -1,13 +1,17 @@
 package com.company;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Hanoi {
+
+    private ArrayList<State> stateHistory = new ArrayList<>();
 
 
     public State init(int numberOfTowers, int numberOfDisks) {
         return new State(numberOfTowers, numberOfDisks);
     }
+
 
     public boolean isFinalState(State state) {
 
@@ -22,6 +26,17 @@ public class Hanoi {
     }
 
     public boolean isValidState(State state, int elementPosition, int tower) {
+        if (elementPosition >= state.getNumberOfTowers()) {
+            return false;
+        }
+
+        State clonedState = state.clone();
+        clonedState.updateState(elementPosition, tower);
+
+        if(existsInHistory(clonedState)) {
+            return false;
+        }
+
         if (state.getElementAt(elementPosition) == tower) {
             return false;
         }
@@ -37,8 +52,20 @@ public class Hanoi {
         }
 
         return true;
-
     }
 
+    public void addStateToHistory(State state) {
+        stateHistory.add(state);
+    }
+
+    private boolean existsInHistory(State state) {
+        for(int i = 0; i < stateHistory.size(); ++i) {
+            if(stateHistory.get(i).equals(state)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }
