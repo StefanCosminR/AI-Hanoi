@@ -67,7 +67,7 @@ public class State implements Cloneable {
 
     @Override
     public State clone() {
-        final State clone;
+        State clone;
         try {
             clone = (State) super.clone();
         }
@@ -76,7 +76,7 @@ public class State implements Cloneable {
         }
         clone.numberOfDisks = this.numberOfDisks;
         clone.numberOfTowers = this.numberOfTowers;
-        clone.elements = (ArrayList<Integer>) this.elements.clone();
+        clone.elements = new ArrayList<Integer>(elements);
         return clone;
     }
 }

@@ -5,9 +5,15 @@ import java.util.Random;
 
 public class Resolver {
 
+    Hanoi hanoi;
+
     public void run(String methodName, int... args) {
         if (Objects.equals(methodName, "random")) {
             random(args[0], args[1]);
+        } else {
+            this.hanoi = new Hanoi();
+            State state = hanoi.init(3, 3);
+            BK(state);
         }
     }
 
@@ -45,20 +51,21 @@ public class Resolver {
         System.out.println(state);
     }
 
-    public void BK(State state, Hanoi hanoi, int numberOfTowers, int numberOfDisks) {
+    public void BK(State state) {
         if (hanoi.isFinalState(state)) {
             System.out.println(state);
-        }
-        int[] nDisk = new int[numberOfDisks];
-        for (int i = 0; i < numberOfDisks; ++i) {
-            nDisk[i] = state.getElementAt(i);
-        }
+        } else {
+            for (int i = 0; i < state.getNumberOfDisks(); ++i) {
+                for (int j = 0; j < state.getNumberOfTowers(); ++j) {
+                    if (hanoi.isValidState(state, i, j)) {
+                        State clonedState = state.clone();
+                        clonedState.updateState(i, j);
+                        BK(clonedState);
+                    }
 
-        for (int i : nDisk) {
-            for (int j = i; j < numberOfTowers; ++j) {
-
+                }
             }
-
         }
+        System.out.println("Ups, this souldn't have happened");
     }
 }
