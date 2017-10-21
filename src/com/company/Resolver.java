@@ -12,7 +12,8 @@ public class Resolver {
             random(args[0], args[1]);
         } else {
             this.hanoi = new Hanoi();
-            State state = hanoi.init(3, 3);
+            State state = hanoi.init(4, 4);
+            hanoi.addStateToHistory(state);
             BK(state);
         }
     }
@@ -60,12 +61,12 @@ public class Resolver {
                     if (hanoi.isValidState(state, i, j)) {
                         State clonedState = state.clone();
                         clonedState.updateState(i, j);
+                        hanoi.addStateToHistory(clonedState);
                         BK(clonedState);
                     }
 
                 }
             }
         }
-        System.out.println("Ups, this souldn't have happened");
     }
 }

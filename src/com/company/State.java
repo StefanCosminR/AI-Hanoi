@@ -16,7 +16,7 @@ public class State implements Cloneable {
         elements = new ArrayList<>();
 
         for (int i = 0; i < numberOfDisks; ++i) {
-            elements.add(1);
+            elements.add(0);
         }
     }
 
