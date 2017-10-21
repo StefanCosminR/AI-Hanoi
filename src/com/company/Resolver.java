@@ -23,6 +23,8 @@ public class Resolver {
         Hanoi hanoi = new Hanoi();
         State state = hanoi.init(numberOfTowers, numberOfDisks);
 
+        hanoi.addStateToHistory(state);
+
         int loopCounter = 0;
         int failedCounter = 0;
         Random random = new Random();
