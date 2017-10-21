@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class State {
+public class State implements Cloneable {
     private int numberOfTowers;
     private int numberOfDisks;
     private ArrayList<Integer> elements;
@@ -50,5 +50,33 @@ public class State {
         result.deleteCharAt(result.length() - 1);
         result.append(")\n");
         return result.toString();
+    }
+
+    public boolean equals(Object o) {
+        State state = (State) o;
+        if (numberOfTowers != state.numberOfTowers || numberOfDisks != state.numberOfDisks) {
+            return false;
+        }
+        for (int i = 0; i < elements.size(); ++i) {
+            if(elements.get(i) != state.getElementAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public State clone() {
+        final State clone;
+        try {
+            clone = (State) super.clone();
+        }
+        catch (CloneNotSupportedException ex) {
+            throw new RuntimeException("superclass messed up", ex);
+        }
+        clone.numberOfDisks = this.numberOfDisks;
+        clone.numberOfTowers = this.numberOfTowers;
+        clone.elements = (ArrayList<Integer>) this.elements.clone();
+        return clone;
     }
 }
