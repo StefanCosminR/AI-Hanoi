@@ -5,18 +5,20 @@ import java.util.Random;
 
 public class Resolver {
 
-    Hanoi hanoi;
+    private Hanoi hanoi;
 
     public void run(String methodName, int... args) {
         if (Objects.equals(methodName, "random")) {
             random(args[0], args[1]);
-        } else if(Objects.equals(methodName, "bkt")) {
+        } else if (Objects.equals(methodName, "bkt")) {
             this.hanoi = new Hanoi();
-            State state = hanoi.init(4, 4);
+            State state = hanoi.init(args[0], args[1]);
             hanoi.addStateToHistory(state);
             BK(state);
-        } else if(Objects.equals(methodName, "star")) {
+        } else if (Objects.equals(methodName, "star")) {
             aStar();
+        } else if ("hillclimbing".equals(methodName)) {
+            hillclimbing(args[0], args[1]);
         }
     }
 
@@ -52,7 +54,7 @@ public class Resolver {
             }
         }
 
-        System.out.println("Finished in " + loopCounter);
+        System.out.println("Finished in " + loopCounter + " loops");
         System.out.println(state);
     }
 
@@ -111,5 +113,40 @@ public class Resolver {
                 }
             }
         }
+    }
+
+    private State getRandomSolution(int numberOfTowers, int numberOfDisks) {
+        Hanoi hanoi = new Hanoi();
+        State state = hanoi.init(numberOfTowers, numberOfDisks);
+        Random random = new Random();
+
+        while (!hanoi.isFinalState(state)) {
+            int selectedPosition = random.nextInt(numberOfDisks);
+            int selectedTower = random.nextInt(numberOfTowers);
+            if (hanoi.isValidState(state, selectedPosition, selectedTower)) {
+                state.updateState(selectedPosition, selectedTower);
+                hanoi.addStateToHistory(state);
+            }
+        }
+        return state;
+    }
+
+    public void hillclimbing(int numberOfTowers, int numberOfDisks) {
+        int iteration, stuck;
+        State candidateSolution;
+        State currentSolution = getRandomSolution(numberOfTowers, numberOfDisks);
+
+        iteration = stuck = 0;
+        while (iteration < 1000 && stuck < 100) {
+            candidateSolution = getRandomSolution(numberOfTowers, numberOfDisks);
+            if (currentSolution.getTransitionsCount() > candidateSolution.getTransitionsCount()) {
+                currentSolution = candidateSolution;
+                stuck = 0;
+            } else {
+                ++stuck;
+            }
+            ++iteration;
+        }
+        System.out.println(currentSolution);
     }
 }
