@@ -12,9 +12,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
-//        solveHanoi("hillclimbing", 4, 4);
-        solveHanoi("bkt", 4, 4);
-//        solveHanoi("random", 4, 4);
-//        solveHanoi("star", 4,4);
+//        solveHanoi("hillclimbing", 3, 3);
+        solveHanoi("hillclimbing2", 3, 3);
+//        solveHanoi("bkt", 3, 3);
+//        solveHanoi("random", 3, 3);
+//        solveHanoi("star", 3,3);
     }
 }

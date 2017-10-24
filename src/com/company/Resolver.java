@@ -1,18 +1,16 @@
 package com.company;
 
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class Resolver {
 
     private Hanoi hanoi;
 
     public void run(String methodName, int... args) {
+        this.hanoi = new Hanoi();
         if (Objects.equals(methodName, "random")) {
             random(args[0], args[1]);
         } else if (Objects.equals(methodName, "bkt")) {
-            this.hanoi = new Hanoi();
             State state = hanoi.init(args[0], args[1]);
             hanoi.addStateToHistory(state);
             BK(state);
@@ -20,6 +18,8 @@ public class Resolver {
             aStar(args[0], args[1]);
         } else if ("hillclimbing".equals(methodName)) {
             hillclimbing(args[0], args[1]);
+        } else if ("hillclimbing2".equals(methodName)) {
+            hillclimbing2(args[0], args[1]);
         }
     }
 
@@ -119,50 +119,59 @@ public class Resolver {
     }
 
 
-    public void generateSolutionMatrix(State state) {
-//        if (hanoi.isFinalState(state)) {
-//            System.out.println(state);
-//        } else {
-//            for (int i = 0; i < state.getNumberOfDisks(); ++i) {
-//                for (int j = 0; j < state.getNumberOfTowers(); ++j) {
-//                    if (hanoi.isValidState(state, i, j)) {
-//                        State clonedState = state.clone();
-//                        clonedState.updateState(i, j);
-//                        hanoi.addStateToHistory(clonedState);
-//                        BK(clonedState);
-//                    }
-//
-//                }
-//            }
-//        }
+    public void generateStatesHeap(State state, ArrayList<State> solution, PriorityQueue<State> validStates) {
+        if (hanoi.isFinalState(state)) {
+            validStates.addAll(solution);
+        } else {
+            for (int i = 0; i < state.getNumberOfDisks(); ++i) {
+                for (int j = 0; j < state.getNumberOfTowers(); ++j) {
+                    if (hanoi.isValidState(state, i, j)) {
+                        State clonedState = state.clone();
+                        clonedState.updateState(i, j);
+                        hanoi.addStateToHistory(clonedState);
+                        solution.add(clonedState);
+                        generateStatesHeap(clonedState, solution, validStates);
+                        solution.remove(solution.size() - 1);
+                        hanoi.removeFromHistory(clonedState);
+                    }
+
+                }
+            }
+        }
     }
 
     public void aStar(int numberOfDisks, int numberOfTowers) {
         this.hanoi = new Hanoi();
         State state = hanoi.init(numberOfTowers, numberOfDisks);
-        hanoi.addStateToHistory(state);
-        StarNode starNode = new StarNode(state);
-        BKStar(starNode);
+        PriorityQueue<State> validStates = new PriorityQueue<>(Comparator.comparingInt(State::getTransitionsCount));
+        generateStatesHeap(state, new ArrayList<>(), validStates);
+        state = hanoi.init(numberOfTowers, numberOfDisks);
+        while (!hanoi.isFinalState(state) && validStates.size() > 0) {
+            state = validStates.peek();
+            validStates.poll();
+        }
+        System.out.println(state);
     }
 
-    public void BKStar(StarNode starNode) {
-        if (!hanoi.isFinalState(starNode.getState())) {
-            for (int i = 0; i < starNode.getState().getNumberOfDisks(); ++i) {
-                for (int j = 0; j < starNode.getState().getNumberOfTowers(); ++j) {
-                    if (hanoi.isValidState(starNode.getState(), i, j)) {
-                        State clonedState = starNode.getState().clone();
-                        clonedState.updateState(i, j);
-                        hanoi.addStateToHistory(clonedState);
-                        StarNode clonedStarNode = new StarNode(clonedState);
-                        StarPath connection = starNode.addExitNode(new StarNode(clonedState));
-                        clonedStarNode.addEnterNode(connection);
-                        BKStar(clonedStarNode);
-                        hanoi.removeFromHistory(starNode.getState());
-                    }
-                }
-            }
-        }
-    }
+
+//    public void BKStar(StarNode starNode) {
+//        if (!hanoi.isFinalState(starNode.getState())) {
+//            for (int i = 0; i < starNode.getState().getNumberOfDisks(); ++i) {
+//                for (int j = 0; j < starNode.getState().getNumberOfTowers(); ++j) {
+//                    if (hanoi.isValidState(starNode.getState(), i, j)) {
+//                        State clonedState = starNode.getState().clone();
+//                        clonedState.updateState(i, j);
+//                        hanoi.addStateToHistory(clonedState);
+//                        StarNode clonedStarNode = new StarNode(clonedState);
+//                        StarPath connection = starNode.addExitNode(new StarNode(clonedState));
+//                        clonedStarNode.addEnterNode(connection);
+//                        BKStar(clonedStarNode);
+//                        hanoi.removeFromHistory(starNode.getState());
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private State getRandomSolution(int numberOfTowers, int numberOfDisks) {
         Hanoi hanoi = new Hanoi();
@@ -197,5 +206,46 @@ public class Resolver {
             ++iteration;
         }
         System.out.println(currentSolution);
+    }
+
+    public int compareStates(State state1, State state2) {
+        int fitness = 0;
+        List<Integer> state1Positions = state1.getElements();
+        List<Integer> state2Positions = state2.getElements();
+
+        for (int index = 0; index < state1Positions.size(); ++index) {
+            if (state1Positions.get(index) < state2Positions.get(index)) {
+                fitness -= 1;
+            } else {
+                fitness += 1;
+            }
+        }
+        return fitness;
+    }
+
+    public void hillclimbing2(int numberOfTowers, int numberOfDisks) {
+        int iteration, randomDisk, randomTower;
+        int MAX_ITERATIONS = 1000;
+        Random random = new Random();
+        State candidateState;
+        State currentState = hanoi.init(numberOfTowers, numberOfDisks);
+
+        for (iteration = 0; iteration < MAX_ITERATIONS && !hanoi.isFinalState(currentState); ++iteration) {
+            randomDisk = random.nextInt(numberOfDisks);
+            randomTower = random.nextInt(numberOfTowers);
+
+            if (hanoi.isValidState(currentState, randomDisk, randomTower)) {
+                candidateState = currentState.clone();
+                candidateState.updateState(randomDisk, randomTower);
+                if (compareStates(currentState, candidateState) > 0) {
+                    currentState = candidateState;
+                }
+            }
+        }
+        if (iteration < MAX_ITERATIONS) {
+            System.out.println(currentState);
+        } else {
+            System.out.println("Solution not found");
+        }
     }
 }

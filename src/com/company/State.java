@@ -73,6 +73,14 @@ public class State implements Cloneable {
         return true;
     }
 
+    public int getScore() {
+        int sum = 0;
+        for (Integer element : elements) {
+            sum += element;
+        }
+        return sum;
+    }
+
     @Override
     public State clone() {
         State clone;
