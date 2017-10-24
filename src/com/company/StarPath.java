@@ -8,8 +8,6 @@ public class StarPath {
     public StarPath(StarNode start, StarNode end) {
         this.start = start;
         this.end = end;
-        this.cost = 0;
+        this.cost = 1;
     }
-
-
 }

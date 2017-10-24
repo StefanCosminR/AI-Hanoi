@@ -58,6 +58,10 @@ public class Hanoi {
         stateHistory.add(state);
     }
 
+    public void removeFromHistory(State state) {
+        stateHistory.remove(state);
+    }
+
     private boolean existsInHistory(State state) {
         for(int i = 0; i < stateHistory.size(); ++i) {
             if(stateHistory.get(i).equals(state)) {
